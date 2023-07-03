@@ -95,9 +95,9 @@ func LoadFromFile(path string) {
 	spew.Dump(_mlm.Name, _mlm.Title, _mlm.Arden, _mlm.Version, _mlm.Date, _mlm.Usage)
 	log.Println("-------------")
 
-	// get last part of the string
-	// split by `\`
-	// then get the last part
+	if err = db.Ping(); err != nil {
+		log.Fatal("ping error:", err)
+	}
 
 }
 
