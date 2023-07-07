@@ -4,8 +4,10 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"database/sql"
+	"log"
 
+	mssql "github.com/microsoft/go-mssqldb"
 	"github.com/spf13/cobra"
 )
 
@@ -21,9 +23,20 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("validate called")
+		connector, err := mssql.NewConnector(makeConnURL().String())
+		CheckErr(err)
 
-		InitDb()
+		// Use SessionInitSql to set any options that cannot be set with the dsn string
+		// With ANSI_NULLS set to ON, compare NULL data with = NULL or <> NULL will return 0 rows
+		connector.SessionInitSQL = "SET ANSI_NULLS ON"
+
+		db = sql.OpenDB(connector)
+		defer db.Close()
+
+		err = db.Ping()
+		CheckErr(err)
+
+		log.Println("Connected!", makeConnURL().String())
 	},
 }
 

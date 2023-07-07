@@ -11,8 +11,8 @@ import (
 	"os/user"
 	"path/filepath"
 	"strings"
+	"sync"
 
-	"github.com/davecgh/go-spew/spew"
 	mssql "github.com/microsoft/go-mssqldb"
 	"github.com/spf13/cobra"
 	"github.com/whichwit/mlm/mlm"
@@ -60,9 +60,15 @@ to quickly create a Cobra application.`,
 			db = sql.OpenDB(connector)
 			defer db.Close()
 
+			var wg sync.WaitGroup
+			wg.Add(len(files))
 			for _, file := range files {
-				LoadFromFile(file)
+				go func(file string) {
+					LoadFromFile(file)
+					defer wg.Done()
+				}(file)
 			}
+			wg.Wait()
 		} else {
 			log.Println("no file to process")
 		}
@@ -75,7 +81,7 @@ func init() {
 
 // load from a single file
 func LoadFromFile(path string) {
-	log.Println("load from file:", path)
+	log.Println("Processing:", path)
 	b, err := os.ReadFile(path)
 	CheckErr(err)
 
@@ -83,22 +89,58 @@ func LoadFromFile(path string) {
 
 	usr, err := user.Current()
 	CheckErr(err)
-
 	username := usr.Username
-
 	if _usr := strings.Split(usr.Username, `\`); len(_usr) > 1 {
 		username = _usr[len(_usr)-1]
 	}
 
-	log.Println("user:", username)
+	// log.Println("user:", username)
 
-	spew.Dump(_mlm.Name, _mlm.Title, _mlm.Arden, _mlm.Version, _mlm.Date, _mlm.Usage)
-	log.Println("-------------")
+	// spew.Dump(_mlm.Name, _mlm.Title, _mlm.Arden, _mlm.Version, _mlm.Date, _mlm.Usage)
+	// spew.Dump(_mlm)
 
 	if err = db.Ping(); err != nil {
 		log.Fatal("ping error:", err)
 	}
 
+	/* reference SP
+	ALTER PROC [dbo].[SCMMlmInsPr]
+
+	(
+	    @UserID		 VARCHAR(30),
+	    @Name        varchar(80),
+	    @Description varchar(255),
+	    @Logic       varchar(Max),
+	    @Status      int,
+	    @UsageType   int = 0,
+	    @Title       varchar(255) = null,
+	    @ArdenVersion varchar(5) = null,
+	    @MLMVersion  varchar(5) = null,
+	    @MLMDate     datetime = null
+	)
+
+	AS
+	*/
+
+	// insert mlm
+	var rs mssql.ReturnStatus
+	db.Exec(
+		"SCMMlmInsPr",
+		sql.Named("UserID", username),
+		sql.Named("Name", _mlm.Name),
+		sql.Named("Title", _mlm.Title),
+		sql.Named("Description", ""),
+		sql.Named("Logic", _mlm.Content),
+		sql.Named("Status", 4),
+		sql.Named("UsageType", _mlm.Usage),
+		sql.Named("ArdenVersion", _mlm.Arden),
+		sql.Named("MLMVersion", _mlm.Version),
+		sql.Named("MLMDate", _mlm.Date),
+		&rs,
+	)
+	log.Println("SCMMlmInsPr return status:", rs)
+	log.Println("Done:", path)
+	log.Println("-------------")
 }
 
 // // read a file

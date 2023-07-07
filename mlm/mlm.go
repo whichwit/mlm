@@ -56,7 +56,7 @@ func (mlm *MedicalLogicModule) parseName() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:.*;;.*(?:mlmname|filename):(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Name = strings.Trim(match[1], " ")
+		mlm.Name = strings.ToUpper(strings.Trim(match[1], " "))
 	}
 }
 

@@ -42,6 +42,8 @@ import (
 func makeConnURL() *url.URL {
 	query := url.Values{}
 	query.Add("database", database)
+	query.Add("TrustServerCertificate", "true")
+	query.Add("app name", "mlm")
 
 	return &url.URL{
 		Scheme:   "sqlserver",
