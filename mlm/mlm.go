@@ -31,7 +31,7 @@ func (mlm *MedicalLogicModule) parseLogic() {
 	re = regexp.MustCompile(`(?sU)(/\*.*\*/)`)
 	logic = re.ReplaceAllString(logic, "")
 
-	mlm.logic = logic
+	mlm.logic = strings.TrimSpace(logic)
 }
 
 // parse evoke slot
@@ -48,7 +48,7 @@ func (mlm *MedicalLogicModule) parseTitle() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Title = strings.Trim(match[1], " ")
+		mlm.Title = strings.TrimSpace(match[1])
 	}
 }
 
@@ -56,7 +56,7 @@ func (mlm *MedicalLogicModule) parseName() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:.*;;.*(?:mlmname|filename):(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Name = strings.ToUpper(strings.Trim(match[1], " "))
+		mlm.Name = strings.ToUpper(strings.TrimSpace(match[1]))
 	}
 }
 
@@ -65,7 +65,7 @@ func (mlm *MedicalLogicModule) parseArden() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:.*;;.*(?:mlmname|filename):.*;;.*arden:\s*version\s*(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Arden = strings.Trim(match[1], " ")
+		mlm.Arden = strings.TrimSpace(match[1])
 	}
 }
 
@@ -74,7 +74,7 @@ func (mlm *MedicalLogicModule) parseVersion() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:.*;;.*(?:mlmname|filename):.*;;.*arden:.*;;.*version:(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Version = strings.Trim(match[1], " ")
+		mlm.Version = strings.TrimSpace(match[1])
 	}
 }
 
@@ -83,7 +83,7 @@ func (mlm *MedicalLogicModule) parseDate() {
 	re := regexp.MustCompile(`(?siU)maintenance:.*title:.*;;.*(?:mlmname|filename):.*;;.*arden:.*;;.*version:.*;;.*date:(.*);;`)
 	match := re.FindStringSubmatch(mlm.logic)
 	if match != nil {
-		mlm.Date = strings.Trim(match[1], " ")
+		mlm.Date = strings.TrimSpace(match[1])
 	}
 }
 
