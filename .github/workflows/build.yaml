@@ -1,6 +1,8 @@
 name: Package program
 
-on: [push]
+on:
+  release:
+    types: [created]
 
 permissions:
   contents: write
