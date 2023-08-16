@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -93,11 +90,6 @@ func LoadFromFile(path string) {
 	if _usr := strings.Split(usr.Username, `\`); len(_usr) > 1 {
 		username = _usr[len(_usr)-1]
 	}
-
-	// log.Println("user:", username)
-
-	// spew.Dump(_mlm.Name, _mlm.Title, _mlm.Arden, _mlm.Version, _mlm.Date, _mlm.Usage)
-	// spew.Dump(_mlm)
 
 	if err = db.Ping(); err != nil {
 		log.Fatal("ping error:", err)
