@@ -2,7 +2,7 @@ name: Build as artifact
 
 on:
   pull_request:
-    types: [opened, reopened, edited]
+    types: [opened, reopened, edited, synchronize]
 
 permissions:
   contents: write
