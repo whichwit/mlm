@@ -16,6 +16,7 @@ import (
 )
 
 var db *sql.DB
+var mirror bool
 
 // loadCmd represents the load command
 var loadCmd = &cobra.Command{
@@ -57,6 +58,18 @@ to quickly create a Cobra application.`,
 			db = sql.OpenDB(connector)
 			defer db.Close()
 
+			if err = db.Ping(); err != nil {
+				log.Fatal("ping error:", err)
+			}
+
+			if mirror {
+				var rs mssql.ReturnStatus
+				db.Exec("UPDATE CV3MLM SET Active = 0 WHERE Active = 1 AND Status = 4", &rs)
+				if rs != 0 {
+					log.Fatal("Inactivate MLM error")
+				}
+			}
+
 			var wg sync.WaitGroup
 			wg.Add(len(files))
 			for _, file := range files {
@@ -74,6 +87,8 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(loadCmd)
+
+	loadCmd.Flags().BoolVar(&mirror, "mirror", false, "mirror the MLM list")
 }
 
 // load from a single file

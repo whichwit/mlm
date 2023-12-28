@@ -39,6 +39,19 @@ var extractCmd = &cobra.Command{
 		}
 		defer rows.Close()
 
+		if !rows.Next() {
+			log.Println("No records found")
+			return
+		}
+
+		// create out directory if it doesn't exist
+		if _, err := os.Stat(outdir); os.IsNotExist(err) {
+			err = os.MkdirAll(outdir, 0755)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
 		for rows.Next() {
 			var (
 				name  string
