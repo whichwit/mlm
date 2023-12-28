@@ -29,7 +29,7 @@ var extractCmd = &cobra.Command{
 		db = sql.OpenDB(connector)
 		defer db.Close()
 
-		q := "SELECT TOP 2 Name, Logic FROM CV3MLM WHERE Active = 1 AND Status = 4"
+		q := "SELECT TOP 3 Name, Logic FROM CV3MLM WHERE Active = 1 AND Status = 4"
 
 		rows, err := db.Query(q)
 		if err != nil {
